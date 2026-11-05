@@ -1,0 +1,25 @@
+# Стек курса «Базы знаний и базы данных», ИУ-1.
+# Неделя 1: только PostgreSQL (образ с TimescaleDB — пригодится на неделе 8).
+# Остальные сервисы (Redis, ClickHouse, Neo4j, ...) будут добавляться по ходу курса.
+
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg17
+    container_name: kbdb-postgres
+    environment:
+      POSTGRES_USER: student
+      POSTGRES_PASSWORD: student
+      POSTGRES_DB: plant
+    ports:
+      - "5432:5432"          # если порт занят — поменяйте на "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d   # схема и датасет загрузятся при ПЕРВОМ старте
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U student -d plant"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
